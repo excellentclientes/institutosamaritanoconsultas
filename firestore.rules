@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Único administrador: conta Google verificada com este e-mail.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'excellentservices.excel@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    // Cadastro dos usuários (licenciados)
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      // Auto-cadastro: sempre entra como licenciado pendente; quem aprova é o admin.
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.role == 'licenciado'
+        && request.resource.data.status == 'pendente'
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.keys().hasOnly(['email','nome','codigo','municipio','role','status','createdAt']);
+      allow update, delete: if isAdmin();
+    }
+
+    // Registro das consultas: gravado apenas pela Cloud Function (Admin SDK ignora estas regras).
+    match /consultas/{id} {
+      allow read: if request.auth != null && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    // Configuração da integração de API: somente o administrador.
+    match /config/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
