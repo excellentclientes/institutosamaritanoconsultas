@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Painel · Atlas Consultas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F4F7F7; --surface:#FFFFFF; --surface-2:#EAF0F0; --ink:#0D1B1E; --muted:#56686D; --line:#D8E2E3;
+  --accent:#0A7B76; --accent-ink:#FFFFFF; --accent-soft:#D8F0EE; --bad:#B4410F;
+  --shadow:0 1px 2px rgba(13,27,30,.05),0 12px 32px -18px rgba(13,27,30,.22);
+  --c1:#0A7B76; --c2:#C98A1B; --c3:#3B6EA5; --c4:#8A5CA8; --c5:#B4410F; --c6:#157F3C; --c7:#6B7C80;
+  --f-display:'Bricolage Grotesque',system-ui,sans-serif; --f-body:'Instrument Sans',system-ui,sans-serif; --f-mono:'JetBrains Mono',ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1315; --surface:#101C1F; --surface-2:#172629; --ink:#E6F0F1; --muted:#8CA2A7; --line:#21363A;
+  --accent:#3CCFC2; --accent-ink:#04201D; --accent-soft:#12383A; --bad:#F0875A;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 34px -18px rgba(0,0,0,.7);
+  --c1:#3CCFC2; --c2:#EBB25A; --c3:#6FA3E0; --c4:#B58BD0; --c5:#F0875A; --c6:#4CD07F; --c7:#8CA2A7; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A1315; --surface:#101C1F; --surface-2:#172629; --ink:#E6F0F1; --muted:#8CA2A7; --line:#21363A;
+  --accent:#3CCFC2; --accent-ink:#04201D; --accent-soft:#12383A; --bad:#F0875A;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 34px -18px rgba(0,0,0,.7);
+  --c1:#3CCFC2; --c2:#EBB25A; --c3:#6FA3E0; --c4:#B58BD0; --c5:#F0875A; --c6:#4CD07F; --c7:#8CA2A7; color-scheme:dark}
+
+*{box-sizing:border-box;margin:0}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{min-height:100%;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+h1,h2,h3,h4{font-family:var(--f-display);letter-spacing:-.02em;line-height:1.15}
+button{font:inherit;color:inherit;cursor:pointer}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.muted{color:var(--muted)}.sm{font-size:13.5px}.mono{font-family:var(--f-mono)}
+[hidden]{display:none!important}
+
+/* estrutura */
+.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;padding:22px 16px;background:var(--surface);border-right:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 22px;font:700 18px var(--f-display);letter-spacing:-.02em}
+.nav{display:grid;gap:4px}
+.nav button,.foot button,.foot a{display:flex;align-items:center;gap:12px;width:100%;height:44px;padding:0 12px;border:0;border-radius:12px;background:transparent;color:var(--muted);font-weight:500;font-size:14.5px;text-align:left;text-decoration:none;transition:background .2s,color .2s}
+.nav button:hover,.foot button:hover,.foot a:hover{background:var(--surface-2);color:var(--ink)}
+.nav button[aria-selected="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.foot{margin-top:auto;display:grid;gap:4px;padding-top:14px;border-top:1px solid var(--line)}
+.main{min-width:0;padding:clamp(20px,4vw,44px)}
+.wrap{max-width:1120px;margin:0 auto}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:26px}
+.head h1{font-size:clamp(1.7rem,3.4vw,2.3rem);font-weight:800}
+.head p{margin-top:6px}
+.seg{display:inline-flex;gap:4px;padding:4px;border-radius:12px;background:var(--surface-2)}
+.seg button{border:0;background:transparent;height:34px;padding:0 14px;border-radius:9px;font-weight:600;font-size:13.5px;color:var(--muted)}
+.seg button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+
+/* cartões */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px}
+.kpi{padding:20px 22px}
+.kpi small{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kpi strong{display:block;margin-top:8px;font:800 clamp(1.6rem,2.6vw,2rem)/1.1 var(--f-display);letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kpi span{display:block;margin-top:4px;font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+.grid .full{grid-column:1/-1}
+.panel{padding:22px 24px;min-width:0}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.panel-h h3{font-size:17px;font-weight:700}
+.link{border:0;background:none;padding:0;font-size:13.5px;font-weight:600;color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+
+/* barras por região */
+.bars{display:grid;gap:14px}
+.bar{display:grid;grid-template-columns:minmax(90px,150px) 1fr 44px;align-items:center;gap:14px;font-size:14px}
+.bar>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .tr{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar .fl{height:100%;border-radius:99px;background:var(--accent);animation:grow .9s cubic-bezier(.2,.7,.2,1) backwards}
+.bar b{text-align:right;font:500 13px var(--f-mono)}
+
+/* linha diária */
+.line{width:100%;height:auto;display:block;overflow:visible}
+.line .grid-l{stroke:var(--line);stroke-width:1}
+.line text{fill:var(--muted);font:11.5px var(--f-body)}
+.line .area{fill:var(--accent);opacity:.12}
+.line .stroke{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.line .hit{fill:transparent}.line .hit:hover{fill:var(--accent);opacity:.1}
+
+/* rosca */
+.donut-wrap{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.donut{width:170px;height:170px;flex:none}
+.donut circle{fill:none;stroke-width:16;transition:opacity .2s}
+.donut text{text-anchor:middle}
+.legend{display:grid;gap:10px;flex:1;min-width:150px;font-size:14px}
+.legend div{display:flex;align-items:center;gap:10px}
+.legend i{width:10px;height:10px;border-radius:3px;flex:none}
+.legend b{margin-left:auto;font:500 13px var(--f-mono)}
+
+/* estados */
+.empty{display:grid;place-items:center;text-align:center;gap:10px;padding:clamp(40px,8vw,80px) 24px;color:var(--muted)}
+.empty .tile{display:grid;place-items:center;width:56px;height:56px;border-radius:16px;background:var(--accent-soft);color:var(--accent);margin-bottom:4px}
+.empty .tile .ic{width:26px;height:26px}
+.empty h3{color:var(--ink);font-size:20px}
+.empty p{max-width:40ch}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 18px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;font-size:14.5px;text-decoration:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.gate .card{max-width:420px;width:100%}
+.err{padding:20px;color:var(--bad);font-weight:500}
+.skel{height:120px;border-radius:20px;background:linear-gradient(90deg,var(--surface-2),var(--surface),var(--surface-2));background-size:200% 100%;animation:sh 1.4s linear infinite}
+.note{margin-top:14px;font-size:12.5px;color:var(--muted)}
+
+@keyframes grow{from{width:0}}
+@keyframes sh{to{background-position:-200% 0}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.rise>*{animation:rise .45s cubic-bezier(.2,.7,.2,1) backwards}
+.rise>*:nth-child(2){animation-delay:.05s}.rise>*:nth-child(3){animation-delay:.1s}.rise>*:nth-child(4){animation-delay:.15s}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* mobile */
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}
+  .brand{padding:0 6px 0 0}.brand span{display:none}
+  .nav{display:flex;gap:4px;flex:1}
+  .nav button{width:auto;height:40px;padding:0 14px}
+  .foot{margin:0;display:flex;padding:0;border:0;gap:2px}
+  .foot button,.foot a{width:40px;height:40px;padding:0;justify-content:center}.foot span{display:none}
+  .grid{grid-template-columns:1fr}
+  .bar{grid-template-columns:minmax(80px,110px) 1fr 38px;gap:10px}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5"/><path d="M6 8h12v3a6 6 0 0 1-12 0V8z"/><path d="M12 17v4"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+</svg>
+
+<!-- Carregando / acesso negado -->
+<div class="gate" id="gate">
+  <div class="card panel" style="text-align:center">
+    <div class="empty" style="padding:24px 8px">
+      <div class="tile"><svg class="ic"><use href="#i-lock"/></svg></div>
+      <h3 id="gateT">Verificando acesso…</h3>
+      <p id="gateP">Aguarde um instante.</p>
+      <a class="btn primary" id="gateBtn" href="index.html" hidden>Voltar ao site</a>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--accent)"/><circle cx="14.5" cy="14.5" r="6" fill="none" stroke="var(--accent-ink)" stroke-width="2.6"/><path d="m19.5 19.5 5.5 5.5" stroke="var(--accent-ink)" stroke-width="2.8" stroke-linecap="round"/></svg>
+      <span>Atlas</span>
+    </div>
+    <nav class="nav" role="tablist" aria-label="Seções do painel">
+      <button type="button" role="tab" data-t="analise" aria-selected="true"><svg class="ic"><use href="#i-chart"/></svg>Análise</button>
+      <button type="button" role="tab" data-t="integracoes" aria-selected="false"><svg class="ic"><use href="#i-plug"/></svg>Integrações</button>
+    </nav>
+    <div class="foot">
+      <button type="button" id="themeBtn" aria-label="Alternar tema claro e escuro"><svg class="ic"><use href="#i-sun"/></svg><span>Alternar tema</span></button>
+      <a href="index.html"><svg class="ic"><use href="#i-back"/></svg><span>Voltar ao site</span></a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="wrap">
+      <section id="pAnalise">
+        <div class="head">
+          <div>
+            <h1>Análise</h1>
+            <p class="muted">Quantidade de consultas por região.</p>
+          </div>
+          <div class="seg" id="period" role="tablist" aria-label="Período">
+            <button type="button" role="tab" data-d="7" aria-selected="false">7 dias</button>
+            <button type="button" role="tab" data-d="30" aria-selected="true">30 dias</button>
+            <button type="button" role="tab" data-d="90" aria-selected="false">90 dias</button>
+          </div>
+        </div>
+        <div id="analiseBody"></div>
+      </section>
+
+      <section id="pIntegracoes" hidden>
+        <div class="head">
+          <div>
+            <h1>Integrações</h1>
+            <p class="muted">Conexões com serviços e fornecedores de dados.</p>
+          </div>
+        </div>
+        <div class="card empty">
+          <div class="tile"><svg class="ic"><use href="#i-plug"/></svg></div>
+          <h3>Nenhuma integração por enquanto</h3>
+          <p>Quando novas integrações forem adicionadas, elas aparecerão aqui para você ativar e gerenciar.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="firebase.js"></script>
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=n=>n.toLocaleString('pt-BR');
+const TIPOS={cpf:'CPF',cnpj:'CNPJ',cep:'Endereço / CEP',placa:'Placa',telefone:'Telefone',email:'E-mail',nome:'Nome'};
+let dias=30,reqId=0;
+
+/* ---------- tema (compartilhado com o site) ---------- */
+const root=document.documentElement;
+try{const s=localStorage.getItem('atlas-theme');if(s)root.dataset.theme=s}catch(e){}
+$('#themeBtn').addEventListener('click',()=>{
+  const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  const n=dark?'light':'dark';root.dataset.theme=n;try{localStorage.setItem('atlas-theme',n)}catch(e){}
+});
+
+/* ---------- acesso: somente administrador ---------- */
+function gate(t,p,btn){$('#gate').hidden=false;$('#app').hidden=true;$('#gateT').textContent=t;$('#gateP').textContent=p;$('#gateBtn').hidden=!btn}
+window.addEventListener('atlas:auth',e=>{
+  const d=e.detail;
+  if(!d.user)return gate('Acesso restrito','Entre com a conta de administrador no site para abrir o painel.',true);
+  if(!d.isAdmin)return gate('Acesso restrito','Esta área é exclusiva do administrador.',true);
+  $('#gate').hidden=true;$('#app').hidden=false;load();
+});
+
+/* ---------- navegação ---------- */
+const PANES={analise:$('#pAnalise'),integracoes:$('#pIntegracoes')};
+$$('.nav button').forEach(b=>b.addEventListener('click',()=>{
+  $$('.nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  Object.entries(PANES).forEach(([k,el])=>el.hidden=k!==b.dataset.t);
+  try{history.replaceState(null,'','#'+b.dataset.t)}catch(e){}
+}));
+if(location.hash==='#integracoes')$('.nav button[data-t="integracoes"]').click();
+$$('#period button').forEach(b=>b.addEventListener('click',()=>{
+  $$('#period button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  dias=+b.dataset.d;load();
+}));
+
+/* ---------- análise ---------- */
+const regiaoDe=c=>{const m=(c.municipio||'').trim();return !m||m==='—'?'Sem município':m};
+const dKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const toDate=ts=>ts&&ts.toDate?ts.toDate():new Date(ts);
+
+async function load(){
+  const id=++reqId,box=$('#analiseBody');
+  box.innerHTML='<div class="skel"></div>';
+  try{
+    const rows=await window.Atlas.adminAnalise(dias);
+    if(id!==reqId)return;
+    render(rows);
+  }catch(err){
+    if(id!==reqId)return;
+    box.innerHTML=`<div class="card err">${esc(window.Atlas.friendly(err))}</div>`;
+  }
+}
+
+function render(rows){
+  const box=$('#analiseBody');
+  if(!rows.length){
+    box.innerHTML=`<div class="card empty"><div class="tile"><svg class="ic"><use href="#i-chart"/></svg></div><h3>Sem consultas no período</h3><p>Assim que os licenciados realizarem consultas, os gráficos aparecerão aqui.</p></div>`;
+    return;
+  }
+  const porReg={},porTipo={},porDia={};
+  rows.forEach(c=>{
+    const r=regiaoDe(c);porReg[r]=(porReg[r]||0)+1;
+    porTipo[c.tipo]=(porTipo[c.tipo]||0)+1;
+    if(c.createdAt){const k=dKey(toDate(c.createdAt));porDia[k]=(porDia[k]||0)+1}
+  });
+  const regs=Object.entries(porReg).sort((a,b)=>b[1]-a[1]);
+  const total=rows.length,media=total/dias;
+  const lider=regs[0];
+
+  box.innerHTML=`<div class="rise">
+    <div class="kpis">
+      <div class="card kpi"><small>Consultas no período</small><strong>${nf(total)}</strong><span>últimos ${dias} dias</span></div>
+      <div class="card kpi"><small>Regiões atendidas</small><strong>${nf(regs.length)}</strong><span>com ao menos 1 consulta</span></div>
+      <div class="card kpi"><small>Região líder</small><strong title="${esc(lider[0])}">${esc(lider[0])}</strong><span>${nf(lider[1])} consultas · ${Math.round(lider[1]/total*100)}%</span></div>
+      <div class="card kpi"><small>Média por dia</small><strong>${media.toLocaleString('pt-BR',{maximumFractionDigits:1})}</strong><span>consultas / dia</span></div>
+    </div>
+    <div class="grid">
+      <div class="card panel"><div class="panel-h"><h3>Consultas por região</h3>${regs.length>8?'<button class="link" id="moreReg" type="button">Ver todas</button>':''}</div><div id="barsReg"></div></div>
+      <div class="card panel"><div class="panel-h"><h3>Por tipo de consulta</h3></div>${donut(porTipo,total)}</div>
+      <div class="card panel full"><div class="panel-h"><h3>Evolução diária</h3><span class="muted sm">consultas por dia</span></div>${linha(porDia)}</div>
+    </div>
+    ${rows.length>=5000?'<p class="note">Exibindo os 5.000 registros mais recentes do período.</p>':''}
+  </div>`;
+
+  let all=false;
+  const drawBars=()=>{
+    const list=all?regs:regs.slice(0,8),max=Math.max(1,...list.map(e=>e[1]));
+    $('#barsReg').innerHTML=`<div class="bars">${list.map(([m,n])=>`<div class="bar"><span title="${esc(m)}">${esc(m)}</span><div class="tr"><div class="fl" style="width:${n/max*100}%"></div></div><b>${nf(n)}</b></div>`).join('')}</div>`;
+  };
+  drawBars();
+  const more=$('#moreReg');
+  if(more)more.addEventListener('click',()=>{all=!all;more.textContent=all?'Ver menos':'Ver todas';drawBars()});
+}
+
+/* gráfico de linha (SVG próprio, sem bibliotecas) */
+function linha(porDia){
+  const days=[],hoje=new Date();hoje.setHours(0,0,0,0);
+  for(let i=dias-1;i>=0;i--){const d=new Date(hoje);d.setDate(d.getDate()-i);days.push({d,n:porDia[dKey(d)]||0})}
+  const W=720,H=240,pl=34,pr=10,pt=12,pb=28,iw=W-pl-pr,ih=H-pt-pb;
+  const max=Math.max(1,...days.map(x=>x.n)),top=max<=4?4:Math.ceil(max/4)*4;
+  const X=i=>pl+(days.length>1?i/(days.length-1)*iw:iw/2),Y=n=>pt+ih-n/top*ih;
+  const pts=days.map((x,i)=>[X(i),Y(x.n)]);
+  const path=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=path+` L${pts[pts.length-1][0].toFixed(1)} ${pt+ih} L${pts[0][0].toFixed(1)} ${pt+ih} Z`;
+  const grid=[0,1,2,3,4].map(i=>{const v=top/4*i,y=Y(v);return `<line class="grid-l" x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}"/><text x="${pl-8}" y="${y+4}" text-anchor="end">${Math.round(v)}</text>`}).join('');
+  const fmt=d=>d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  const idx=[0,Math.floor((days.length-1)/2),days.length-1];
+  const labs=idx.map((i,k)=>`<text x="${X(i)}" y="${H-6}" text-anchor="${k===0?'start':k===2?'end':'middle'}">${fmt(days[i].d)}</text>`).join('');
+  const w=days.length>1?iw/(days.length-1):iw;
+  const hits=days.map((x,i)=>`<rect class="hit" x="${X(i)-w/2}" y="${pt}" width="${w}" height="${ih}"><title>${fmt(x.d)}: ${x.n} consulta${x.n===1?'':'s'}</title></rect>`).join('');
+  return `<svg class="line" viewBox="0 0 ${W} ${H}" role="img" aria-label="Consultas por dia nos últimos ${dias} dias">${grid}<path class="area" d="${area}"/><path class="stroke" d="${path}"/>${labs}${hits}</svg>`;
+}
+
+/* rosca por tipo */
+function donut(porTipo,total){
+  const ent=Object.entries(porTipo).sort((a,b)=>b[1]-a[1]);
+  const R=62,C=2*Math.PI*R;let off=0;
+  const segs=ent.map(([k,n],i)=>{
+    const len=n/total*C,col=`var(--c${Math.min(i+1,7)})`;
+    const s=`<circle cx="85" cy="85" r="${R}" stroke="${col}" stroke-dasharray="${Math.max(len-2,0.5).toFixed(2)} ${(C-len+2).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 85 85)"><title>${esc(TIPOS[k]||k)}: ${n}</title></circle>`;
+    off+=len;return s;
+  }).join('');
+  const leg=ent.map(([k,n],i)=>`<div><i style="background:var(--c${Math.min(i+1,7)})"></i>${esc(TIPOS[k]||k)}<b>${Math.round(n/total*100)}%</b></div>`).join('');
+  return `<div class="donut-wrap"><svg class="donut" viewBox="0 0 170 170" role="img" aria-label="Distribuição por tipo de consulta"><circle cx="85" cy="85" r="${R}" stroke="var(--surface-2)"/>${segs}<text x="85" y="88" style="font:800 26px var(--f-display);fill:var(--ink)">${nf(total)}</text><text x="85" y="106" style="font:12px var(--f-body);fill:var(--muted)">consultas</text></svg><div class="legend">${leg}</div></div>`;
+}
+})();
+</script>
+</body>
+</html>

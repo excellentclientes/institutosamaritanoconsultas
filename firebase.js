@@ -139,6 +139,12 @@ window.Atlas = {
     await updateDoc(doc(db, "users", uid), allowed);
   },
   async listConsultas(n = 100) { return rows(await getDocs(query(collection(db, "consultas"), orderBy("createdAt", "desc"), limit(n)))); },
+  // Painel de análise: consultas dos últimos N dias (até 5.000 registros)
+  async adminAnalise(dias = 30) {
+    const ini = new Date(); ini.setHours(0, 0, 0, 0); ini.setDate(ini.getDate() - (dias - 1));
+    const q = query(collection(db, "consultas"), where("createdAt", ">=", Timestamp.fromDate(ini)), orderBy("createdAt", "desc"), limit(5000));
+    return rows(await getDocs(q));
+  },
   async getApiConfig() { const s = await getDoc(doc(db, "config", "api")); return s.exists() ? s.data() : null; },
   async saveApiConfig(cfg) { await setDoc(doc(db, "config", "api"), { ...cfg, updatedAt: serverTimestamp(), updatedBy: auth.currentUser.email }, { merge: true }); }
 };

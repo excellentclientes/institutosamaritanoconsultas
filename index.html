@@ -289,7 +289,7 @@ td .f{width:100%;min-width:120px}
       Atlas
     </a>
     <nav class="main" aria-label="Principal">
-      <a href="#catalogo">Consultas</a><a href="#fluxo">Como funciona</a><a href="#" id="navAdmin" hidden>Painel admin</a><a href="#seguranca">Segurança</a>
+      <a href="#catalogo">Consultas</a><a href="#fluxo">Como funciona</a><a href="#" id="navAdmin" hidden>Painel admin</a><a href="painel.html" id="navPainel" hidden>Análise</a><a href="#seguranca">Segurança</a>
     </nav>
     <span class="sp"></span>
     <span class="who" id="who" hidden><i id="whoI">–</i><span id="whoT"></span></span>
@@ -613,7 +613,7 @@ window.addEventListener('atlas:auth',e=>{
   $('#who').hidden=!on;$('#loginTxt').textContent=on?'Sair':'Entrar';
   const nm=d.profile?(d.isAdmin?'Administrador':(d.profile.codigo||d.profile.nome||d.user.email)):(d.user?d.user.email:'');
   $('#whoT').textContent=nm;$('#whoI').textContent=(nm||'?').trim().slice(0,2).toUpperCase();
-  $('#navAdmin').hidden=!d.isAdmin;
+  $('#navAdmin').hidden=!d.isAdmin;$('#navPainel').hidden=!d.isAdmin;
   if(on&&!modal.hidden){closeM()}
   if(on){
     if(d.error)toast('Não foi possível carregar seu cadastro: '+d.error);
