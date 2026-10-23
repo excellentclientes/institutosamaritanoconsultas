@@ -9,27 +9,41 @@ service cloud.firestore {
         && request.auth.token.email_verified == true;
     }
 
+    // Permissões concedidas pelo administrador a outros e-mails (documento = e-mail em minúsculas).
+    function mail() { return request.auth.token.email.lower(); }
+    function can(p) {
+      return request.auth != null && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/permissoes/$(mail()))
+        && get(/databases/$(database)/documents/permissoes/$(mail())).data.get(p, false) == true;
+    }
+
+    match /permissoes/{id} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.token.email_verified == true && id == mail());
+      allow write: if isAdmin();
+    }
+
     // Cadastro dos usuários (licenciados)
     match /users/{uid} {
-      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin() || can('licenciados') || can('analise'));
       // Auto-cadastro: sempre entra como licenciado pendente; quem aprova é o admin.
       allow create: if request.auth != null && request.auth.uid == uid
         && request.resource.data.role == 'licenciado'
         && request.resource.data.status == 'pendente'
         && request.resource.data.email == request.auth.token.email
         && request.resource.data.keys().hasOnly(['email','nome','codigo','municipio','role','status','createdAt']);
-      allow update, delete: if isAdmin();
+      allow update: if isAdmin() || (can('licenciados') && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nome','codigo','municipio','status']));
+      allow delete: if isAdmin();
     }
 
     // Registro das consultas: gravado apenas pela Cloud Function (Admin SDK ignora estas regras).
     match /consultas/{id} {
-      allow read: if request.auth != null && (resource.data.uid == request.auth.uid || isAdmin());
+      allow read: if request.auth != null && (resource.data.uid == request.auth.uid || isAdmin() || can('registros') || can('analise'));
       allow write: if false;
     }
 
     // Configuração da integração de API: somente o administrador.
     match /config/{docId} {
-      allow read, write: if isAdmin();
+      allow read, write: if isAdmin() || can('api');
     }
 
     match /{document=**} { allow read, write: if false; }

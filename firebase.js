@@ -11,7 +11,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
   getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, limit,
-  where, getDocs, getCountFromServer, serverTimestamp, Timestamp
+  where, getDocs, getCountFromServer, serverTimestamp, Timestamp, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
 
@@ -56,14 +56,30 @@ async function loadProfile(user) {
   return snap.data();
 }
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { emit("atlas:auth", { user: null, profile: null, isAdmin: false }); return; }
+// Abas do painel que o administrador pode liberar para outros e-mails.
+const PERM_KEYS = ["analise", "licenciados", "registros", "api"];
+const emailId = (e) => String(e || "").trim().toLowerCase();
+
+async function loadPerms(user) {
+  if (isAdminUser(user)) return { analise: true, licenciados: true, registros: true, api: true, permissoes: true };
+  if (user.emailVerified !== true) return {};
   try {
-    const profile = await loadProfile(user);
-    emit("atlas:auth", { user: { uid: user.uid, email: user.email }, profile, isAdmin: isAdminUser(user) });
+    const s = await getDoc(doc(db, "permissoes", emailId(user.email)));
+    if (!s.exists()) return {};
+    const d = s.data(), p = {};
+    PERM_KEYS.forEach((k) => { if (d[k] === true) p[k] = true; });
+    return p;
+  } catch (_) { return {}; }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { emit("atlas:auth", { user: null, profile: null, isAdmin: false, perms: {} }); return; }
+  try {
+    const [profile, perms] = await Promise.all([loadProfile(user), loadPerms(user)]);
+    emit("atlas:auth", { user: { uid: user.uid, email: user.email }, profile, isAdmin: isAdminUser(user), perms });
   } catch (e) {
     console.error(e);
-    emit("atlas:auth", { user: { uid: user.uid, email: user.email }, profile: null, isAdmin: false, error: e.message });
+    emit("atlas:auth", { user: { uid: user.uid, email: user.email }, profile: null, isAdmin: false, perms: {}, error: e.message });
   }
 });
 
@@ -145,6 +161,18 @@ window.Atlas = {
     const q = query(collection(db, "consultas"), where("createdAt", ">=", Timestamp.fromDate(ini)), orderBy("createdAt", "desc"), limit(5000));
     return rows(await getDocs(q));
   },
+  // ----- permissões (somente o administrador altera) -----
+  PERM_KEYS,
+  async listPerms() { return rows(await getDocs(query(collection(db, "permissoes"), limit(500)))); },
+  async setPerm(email, perms) {
+    const id = emailId(email);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(id)) throw new Error("E-mail inválido.");
+    if (id === ADMIN_EMAIL) throw new Error("O administrador já tem acesso total.");
+    const data = { email: id, updatedAt: serverTimestamp(), updatedBy: auth.currentUser.email };
+    PERM_KEYS.forEach((k) => { data[k] = perms[k] === true; });
+    await setDoc(doc(db, "permissoes", id), data, { merge: true });
+  },
+  async deletePerm(email) { await deleteDoc(doc(db, "permissoes", emailId(email))); },
   async getApiConfig() { const s = await getDoc(doc(db, "config", "api")); return s.exists() ? s.data() : null; },
   async saveApiConfig(cfg) { await setDoc(doc(db, "config", "api"), { ...cfg, updatedAt: serverTimestamp(), updatedBy: auth.currentUser.email }, { merge: true }); }
 };

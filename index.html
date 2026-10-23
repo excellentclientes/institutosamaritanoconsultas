@@ -289,7 +289,7 @@ td .f{width:100%;min-width:120px}
       Instituto Samaritano
     </a>
     <nav class="main" aria-label="Principal">
-      <a href="#catalogo">Consultas</a><a href="#fluxo">Como funciona</a><a href="#" id="navAdmin" hidden>Painel admin</a><a href="painel.html" id="navPainel" hidden>Análise</a><a href="#seguranca">Segurança</a>
+      <a href="#catalogo">Consultas</a><a href="#fluxo">Como funciona</a><a href="#seguranca">Segurança</a>
     </nav>
     <span class="sp"></span>
     <span class="who" id="who" hidden><i id="whoI">–</i><span id="whoT"></span></span>
@@ -382,23 +382,6 @@ td .f{width:100%;min-width:120px}
   </div>
 </section>
 </main>
-<div id="adminView" hidden>
-  <div class="wrap" style="padding-block:32px 72px">
-    <div class="adm-h">
-      <div><div class="kicker">Painel do administrador</div><h2>Gestão do Instituto Samaritano</h2></div>
-      <button class="btn" id="admBack" type="button">Voltar ao site</button>
-    </div>
-    <div class="tabs" id="admTabs" role="tablist">
-      <button class="tab" type="button" role="tab" data-t="visao" aria-selected="true">Visão geral</button>
-      <button class="tab" type="button" role="tab" data-t="lic" aria-selected="false">Licenciados</button>
-      <button class="tab" type="button" role="tab" data-t="reg" aria-selected="false">Registros</button>
-      <button class="tab" type="button" role="tab" data-t="api" aria-selected="false">API</button>
-    </div>
-    <div id="pVisao"></div><div id="pLic" hidden></div><div id="pReg" hidden></div><div id="pApi" hidden></div>
-  </div>
-</div>
-
-
 <footer><div class="wrap"><span>© 2026 Instituto Samaritano. Todos os direitos reservados.</span><span>Acesso restrito a usuários autorizados</span></div></footer>
 
 <div class="modal" id="modal" hidden>
@@ -429,6 +412,8 @@ td .f{width:100%;min-width:120px}
     </div>
   </div>
 </div>
+<a class="fab-painel" id="fabPainel" href="painel.html" hidden><svg class="ic"><use href="#i-layers"/></svg>Voltar ao painel</a>
+<style>.fab-painel{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:90;display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px;border-radius:99px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14.5px;text-decoration:none;box-shadow:0 10px 28px -8px rgba(0,0,0,.45)}.fab-painel:hover{transform:translateY(-2px)}.fab-painel[hidden]{display:none}</style>
 <div class="toast" id="toast" role="status"></div>
 <script type="module" src="firebase.js"></script>
 <script>
@@ -613,7 +598,7 @@ window.addEventListener('atlas:auth',e=>{
   $('#who').hidden=!on;$('#loginTxt').textContent=on?'Sair':'Entrar';
   const nm=d.profile?(d.isAdmin?'Administrador':(d.profile.codigo||d.profile.nome||d.user.email)):(d.user?d.user.email:'');
   $('#whoT').textContent=nm;$('#whoI').textContent=(nm||'?').trim().slice(0,2).toUpperCase();
-  $('#navAdmin').hidden=!d.isAdmin;$('#navPainel').hidden=!d.isAdmin;
+  $('#fabPainel').hidden=!d.isAdmin;
   const fresh=on&&!modal.hidden;if(fresh){closeM()}
   if(fresh&&d.isAdmin){location.href='painel.html';return}
   if(on){
@@ -621,75 +606,9 @@ window.addEventListener('atlas:auth',e=>{
     else if(d.isAdmin)toast('Bem-vindo, administrador.');
     else if(d.profile&&d.profile.status!=='ativo')toast(d.profile.status==='bloqueado'?'Seu acesso está bloqueado.':'Cadastro recebido. Aguarde a liberação do administrador.');
     else toast('Login realizado com sucesso.');
-  }else{showSite()}
+  }
 });
 
-/* ---------- painel administrativo ---------- */
-const adminView=$('#adminView'),mainEl=$('#topo');
-function showSite(){adminView.hidden=true;mainEl.hidden=false;window.scrollTo(0,0)}
-function showAdmin(){if(!state.isAdmin)return;mainEl.hidden=true;adminView.hidden=false;window.scrollTo(0,0);admTab('visao')}
-$('#navAdmin').addEventListener('click',e=>{e.preventDefault();showAdmin()});
-$('#admBack').addEventListener('click',showSite);
-const PANES={visao:$('#pVisao'),lic:$('#pLic'),reg:$('#pReg'),api:$('#pApi')};
-const LOAD={visao:loadVisao,lic:loadLic,reg:loadReg,api:loadApi};
-function admTab(t){
-  $$('#admTabs .tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));
-  Object.entries(PANES).forEach(([k,el])=>el.hidden=k!==t);
-  PANES[t].innerHTML='<div class="box"><div class="empty">Carregando…</div></div>';
-  LOAD[t]().catch(err=>{PANES[t].innerHTML=`<div class="box"><div class="errbox">${esc(A().friendly(err))}</div></div>`});
-}
-$$('#admTabs .tab').forEach(b=>b.addEventListener('click',()=>admTab(b.dataset.t)));
-const fmtTs=ts=>{try{const d=ts&&ts.toDate?ts.toDate():new Date(ts);return d.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}catch(_){return '—'}};
-const stPill=s=>`<span class="pill ${tagCls(s)||''}">${esc(s||'—')}</span>`;
-const logRows=l=>l.map(c=>`<tr><td class="mono">${fmtTs(c.createdAt)}</td><td>${esc((T[c.tipo]||{}).label||c.tipo)}</td><td class="mono">${esc(c.valorMascarado)}</td><td>${esc(c.codigo||c.email||'—')}</td><td>${esc(c.municipio||'—')}</td><td>${stPill(c.status)}</td></tr>`).join('');
-const logTable=l=>`<div class="tw"><table><thead><tr><th>Data/hora</th><th>Tipo</th><th>Consulta</th><th>Licenciado</th><th>Município</th><th>Status</th></tr></thead><tbody id="logBody">${l.length?logRows(l):'<tr><td colspan="6" class="empty">Nenhuma consulta registrada ainda.</td></tr>'}</tbody></table></div>`;
-
-async function loadVisao(){
-  const [s,log]=await Promise.all([A().adminStats(),A().listConsultas(10)]);
-  const ent=Object.entries(s.porMunicipio).sort((a,b)=>b[1]-a[1]).slice(0,6),max=Math.max(1,...ent.map(e=>e[1]));
-  PANES.visao.innerHTML=`<div class="dash"><div class="kpis">
-    <div class="kpi"><small>Licenciados ativos</small><strong>${s.licenciadosAtivos}</strong></div>
-    <div class="kpi"><small>Consultas hoje</small><strong>${s.consultasHoje}</strong></div>
-    <div class="kpi"><small>Municípios hoje</small><strong>${s.municipios}</strong></div></div>
-    <div class="dash-mid" style="grid-template-columns:1fr"><div><h4>Consultas de hoje por município</h4>${ent.length?`<div class="bars">${ent.map(([m,n])=>`<div class="bar"><span>${esc(m)}</span><div class="tr"><div class="fl" style="width:${n/max*100}%"></div></div><b>${n}</b></div>`).join('')}</div>`:'<p class="muted sm">Sem consultas hoje.</p>'}</div></div>
-    <div class="dash-bar" style="border-top:1px solid var(--line)">Últimas consultas</div>${logTable(log)}</div>`;
-}
-async function loadLic(){
-  const us=(await A().listUsers()).sort((a,b)=>(a.status==='pendente'?-1:0)-(b.status==='pendente'?-1:0));
-  const opt=(v,s)=>['pendente','ativo','bloqueado'].map(o=>`<option value="${o}"${o===s?' selected':''}>${o[0].toUpperCase()+o.slice(1)}</option>`).join('');
-  PANES.lic.innerHTML=`<div class="box"><div class="dash-bar">${ic('users')}Licenciados<span class="pill">${us.length}</span></div><div class="tw"><table><thead><tr><th>Nome / e-mail</th><th>Código</th><th>Município</th><th>Status</th><th></th></tr></thead><tbody>${us.length?us.map(u=>`<tr data-uid="${esc(u.id)}"><td><b>${esc(u.nome||'')}</b><br><span class="muted sm">${esc(u.email)}</span></td><td><input class="f" data-f="codigo" value="${esc(u.codigo||'')}" placeholder="LIC-0001"></td><td><input class="f" data-f="municipio" value="${esc(u.municipio||'')}" placeholder="Cidade · UF"></td><td><select class="f" data-f="status">${opt(0,u.status)}</select></td><td><button class="btn sm2 primary" data-save type="button">Salvar</button></td></tr>`).join(''):'<tr><td colspan="5" class="empty">Nenhum licenciado cadastrado ainda.</td></tr>'}</tbody></table></div></div>`;
-  PANES.lic.onclick=async e=>{
-    const b=e.target.closest('[data-save]');if(!b)return;
-    const tr=b.closest('tr'),data={};$$('[data-f]',tr).forEach(i=>data[i.dataset.f]=i.value.trim());
-    b.disabled=true;
-    try{await A().updateUser(tr.dataset.uid,data);toast('Licenciado atualizado.')}catch(err){toast(A().friendly(err))}
-    b.disabled=false;
-  };
-}
-async function loadReg(){
-  const l=await A().listConsultas(200);
-  PANES.reg.innerHTML=`<div class="box"><div class="dash-bar">${ic('log')}Registros de consultas<input class="f" id="logQ" placeholder="Filtrar por licenciado, município ou tipo" style="margin-left:auto;min-width:240px"></div>${logTable(l)}</div>`;
-  $('#logQ').addEventListener('input',e=>{const t=e.target.value.toLowerCase();$('#logBody').innerHTML=logRows(l.filter(c=>[c.codigo,c.email,c.municipio,c.tipo,c.status].join(' ').toLowerCase().includes(t)))||'<tr><td colspan="6" class="empty">Nada encontrado.</td></tr>'});
-}
-async function loadApi(){
-  const c=(await A().getApiConfig())||{};const ep=c.endpoints||{};
-  PANES.api.innerHTML=`<div class="box pad"><h3 style="font-size:20px;margin-bottom:6px">Integração de API</h3><p class="muted sm">Configure aqui o fornecedor dos dados. Os endereços usam <code class="mono">{valor}</code> no lugar do dado consultado (somente números para CPF, CNPJ, CEP e telefone).</p>
-  <form id="apiForm" style="margin-top:18px"><label class="chk"><input type="checkbox" id="apiOn"${c.ativo?' checked':''}>Integração ativa</label>
-  <div class="grid2" style="margin-top:16px">
-    <label>Nome do fornecedor<input class="f" id="apiProv" value="${esc(c.provedor||'')}" placeholder="Ex.: Fornecedor X"></label>
-    <label>URL base<input class="f" id="apiBase" value="${esc(c.baseUrl||'')}" placeholder="https://api.fornecedor.com/v1"></label>
-    <label>Cabeçalho de autenticação<input class="f" id="apiHdr" value="${esc(c.headerAuth||'Authorization')}"></label>
-    <label>Prefixo da chave<input class="f" id="apiPre" value="${esc(c.prefixoAuth??'Bearer ')}" placeholder="Bearer "></label>
-  </div>
-  <h4 style="margin:24px 0 12px;font-size:16px">Caminho de cada consulta</h4>
-  <div class="grid2">${Object.keys(T).map(k=>`<label>${T[k].label}<input class="f mono" data-ep="${k}" value="${esc(ep[k]||'')}" placeholder="/${k}/{valor}"></label>`).join('')}</div>
-  <button class="btn primary" type="submit" style="margin-top:22px">Salvar configuração</button></form>
-  <div class="hint">A <b>chave secreta</b> do fornecedor não é salva aqui nem no navegador. Cadastre-a no servidor com <code>firebase functions:secrets:set PROVIDER_API_KEY</code> e publique as Functions.${c.updatedBy?`<br>Última alteração: ${esc(c.updatedBy)} · ${fmtTs(c.updatedAt)}`:''}</div></div>`;
-  $('#apiForm').addEventListener('submit',async e=>{e.preventDefault();
-    const endpoints={};$$('[data-ep]').forEach(i=>{if(i.value.trim())endpoints[i.dataset.ep]=i.value.trim()});
-    try{await A().saveApiConfig({ativo:$('#apiOn').checked,provedor:$('#apiProv').value.trim(),baseUrl:$('#apiBase').value.trim(),headerAuth:$('#apiHdr').value.trim()||'Authorization',prefixoAuth:$('#apiPre').value,endpoints});toast('Configuração salva.')}catch(err){toast(A().friendly(err))}
-  });
-}
 })();
 </script>
 

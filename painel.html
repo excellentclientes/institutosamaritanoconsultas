@@ -116,6 +116,27 @@ button{font:inherit;color:inherit;cursor:pointer}
 .rise>*:nth-child(2){animation-delay:.05s}.rise>*:nth-child(3){animation-delay:.1s}.rise>*:nth-child(4){animation-delay:.15s}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
+/* tabelas e formulários (gestão) */
+.tw{overflow-x:auto}
+table{width:100%;min-width:640px;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:12px 18px;background:var(--surface-2)}
+td{padding:12px 18px;border-top:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+.f{height:40px;padding:0 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:14px var(--f-body);min-width:0}
+.f:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+td .f{width:100%;min-width:120px}
+.sm2{height:36px;padding:0 14px;font-size:13.5px}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;background:var(--surface-2);font-size:12.5px;font-weight:600}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}.pill.bad{color:var(--bad)}
+.bar-h{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface-2);font-weight:600}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px 20px}
+.grid2 label{display:block;font-size:13px;font-weight:600}.grid2 .f{width:100%;margin-top:6px}
+.chk{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-right:14px;cursor:pointer}
+.chk input{width:18px;height:18px;margin:0}
+.hint{margin-top:16px;padding:14px;border-radius:12px;background:var(--accent-soft);color:var(--ink);font-size:13.5px}
+.pad{padding:22px 24px}.stack>*+*{margin-top:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:120;max-width:calc(100% - 32px);padding:12px 18px;border-radius:14px;background:var(--ink);color:var(--bg);font-size:14px;font-weight:500;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:all .3s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
 /* mobile */
 @media (max-width:860px){
   .app{grid-template-columns:1fr}
@@ -137,6 +158,10 @@ button{font:inherit;color:inherit;cursor:pointer}
   <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5"/><path d="M6 8h12v3a6 6 0 0 1-12 0V8z"/><path d="M12 17v4"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18 14.3c2.2.7 3.5 2.6 3.5 5.7"/></symbol>
+  <symbol id="i-log" viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4M10 12h6M10 16h6"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="m9 12 2 2 4-4"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
 </svg>
 
@@ -159,12 +184,16 @@ button{font:inherit;color:inherit;cursor:pointer}
       <span>Instituto Samaritano</span>
     </div>
     <nav class="nav" role="tablist" aria-label="Seções do painel">
-      <button type="button" role="tab" data-t="analise" aria-selected="true"><svg class="ic"><use href="#i-chart"/></svg>Análise</button>
-      <button type="button" role="tab" data-t="integracoes" aria-selected="false"><svg class="ic"><use href="#i-plug"/></svg>Integrações</button>
+      <button type="button" role="tab" data-t="analise" data-p="analise" aria-selected="false" hidden><svg class="ic"><use href="#i-chart"/></svg>Análise</button>
+      <button type="button" role="tab" data-t="licenciados" data-p="licenciados" aria-selected="false" hidden><svg class="ic"><use href="#i-users"/></svg>Licenciados</button>
+      <button type="button" role="tab" data-t="registros" data-p="registros" aria-selected="false" hidden><svg class="ic"><use href="#i-log"/></svg>Registros</button>
+      <button type="button" role="tab" data-t="api" data-p="api" aria-selected="false" hidden><svg class="ic"><use href="#i-key"/></svg>API</button>
+      <button type="button" role="tab" data-t="permissoes" data-p="permissoes" aria-selected="false" hidden><svg class="ic"><use href="#i-shield"/></svg>Permissões</button>
+      <button type="button" role="tab" data-t="integracoes" data-p="analise" aria-selected="false" hidden><svg class="ic"><use href="#i-plug"/></svg>Integrações</button>
     </nav>
     <div class="foot">
       <button type="button" id="themeBtn" aria-label="Alternar tema claro e escuro"><svg class="ic"><use href="#i-sun"/></svg><span>Alternar tema</span></button>
-      <a href="index.html"><svg class="ic"><use href="#i-back"/></svg><span>Voltar ao site</span></a>
+      <a href="index.html" id="toSite"><svg class="ic"><use href="#i-back"/></svg><span>Entrar no site</span></a>
     </div>
   </aside>
 
@@ -185,6 +214,10 @@ button{font:inherit;color:inherit;cursor:pointer}
         <div id="analiseBody"></div>
       </section>
 
+      <section id="pLicenciados" hidden><div class="head"><div><h1>Licenciados</h1><p class="muted">Libere, bloqueie e defina código e município de cada licenciado.</p></div></div><div id="licBody"></div></section>
+      <section id="pRegistros" hidden><div class="head"><div><h1>Registros</h1><p class="muted">Histórico das consultas realizadas.</p></div></div><div id="regBody"></div></section>
+      <section id="pApi" hidden><div class="head"><div><h1>API</h1><p class="muted">Integração com o fornecedor de dados.</p></div></div><div id="apiBody"></div></section>
+      <section id="pPermissoes" hidden><div class="head"><div><h1>Permissões</h1><p class="muted">Escolha quais e-mails podem acessar este painel e quais abas cada um vê.</p></div></div><div id="permBody"></div></section>
       <section id="pIntegracoes" hidden>
         <div class="head">
           <div>
@@ -202,6 +235,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   </main>
 </div>
 
+<div class="toast" id="toast" role="status"></div>
 <script type="module" src="firebase.js"></script>
 <script>
 (()=>{
@@ -221,25 +255,107 @@ $('#themeBtn').addEventListener('click',()=>{
 
 /* ---------- acesso: somente administrador ---------- */
 function gate(t,p,btn){$('#gate').hidden=false;$('#app').hidden=true;$('#gateT').textContent=t;$('#gateP').textContent=p;$('#gateBtn').hidden=!btn}
+let perms={},isAdm=false,loaded={};
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),3200)};
+const A=()=>window.Atlas;
 window.addEventListener('atlas:auth',e=>{
   const d=e.detail;
-  if(!d.user)return gate('Acesso restrito','Entre com a conta de administrador no site para abrir o painel.',true);
-  if(!d.isAdmin)return gate('Acesso restrito','Esta área é exclusiva do administrador.',true);
-  $('#gate').hidden=true;$('#app').hidden=false;load();
+  if(!d.user)return gate('Acesso restrito','Entre com uma conta autorizada no site para abrir o painel.',true);
+  perms=d.perms||{};isAdm=d.isAdmin;
+  const tabs=$$('.nav button');let first=null;
+  tabs.forEach(b=>{const ok=isAdm||(b.dataset.p!=='permissoes'&&perms[b.dataset.p]);b.hidden=!ok;if(ok&&!first)first=b});
+  if(!first)return gate('Acesso restrito','Esta conta não tem permissão para o painel. Peça ao administrador.',true);
+  $('#toSite').hidden=false;
+  $('#gate').hidden=true;$('#app').hidden=false;loaded={};
+  const want=$('.nav button[data-t="'+location.hash.slice(1)+'"]:not([hidden])');
+  open_((want||first).dataset.t);
 });
 
 /* ---------- navegação ---------- */
-const PANES={analise:$('#pAnalise'),integracoes:$('#pIntegracoes')};
-$$('.nav button').forEach(b=>b.addEventListener('click',()=>{
-  $$('.nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
-  Object.entries(PANES).forEach(([k,el])=>el.hidden=k!==b.dataset.t);
-  try{history.replaceState(null,'','#'+b.dataset.t)}catch(e){}
-}));
-if(location.hash==='#integracoes')$('.nav button[data-t="integracoes"]').click();
+const PANES={analise:$('#pAnalise'),licenciados:$('#pLicenciados'),registros:$('#pRegistros'),api:$('#pApi'),permissoes:$('#pPermissoes'),integracoes:$('#pIntegracoes')};
+const LOAD={analise:()=>load(),licenciados:loadLic,registros:loadReg,api:loadApi,permissoes:loadPerm,integracoes:async()=>{}};
+function open_(t){
+  $$('.nav button').forEach(x=>x.setAttribute('aria-selected',x.dataset.t===t));
+  Object.entries(PANES).forEach(([k,el])=>el.hidden=k!==t);
+  try{history.replaceState(null,'','#'+t)}catch(e){}
+  Promise.resolve(LOAD[t]()).catch(err=>{const el=PANES[t].querySelector('[id$="Body"]')||PANES[t];el.innerHTML=`<div class="card err">${esc(A().friendly(err))}</div>`});
+}
+$$('.nav button').forEach(b=>b.addEventListener('click',()=>open_(b.dataset.t)));
 $$('#period button').forEach(b=>b.addEventListener('click',()=>{
   $$('#period button').forEach(x=>x.setAttribute('aria-selected',x===b));
   dias=+b.dataset.d;load();
 }));
+
+/* ---------- gestão ---------- */
+const fmtTs=ts=>{try{const d=ts&&ts.toDate?ts.toDate():new Date(ts);return d.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}catch(_){return '—'}};
+const stPill=s=>`<span class="pill ${s==='Concluída'?'ok':'bad'}">${esc(s||'—')}</span>`;
+const logRows=l=>l.map(c=>`<tr><td class="mono">${fmtTs(c.createdAt)}</td><td>${esc(TIPOS[c.tipo]||c.tipo)}</td><td class="mono">${esc(c.valorMascarado)}</td><td>${esc(c.codigo||c.email||'—')}</td><td>${esc(c.municipio||'—')}</td><td>${stPill(c.status)}</td></tr>`).join('');
+const logTable=l=>`<div class="tw"><table><thead><tr><th>Data/hora</th><th>Tipo</th><th>Consulta</th><th>Licenciado</th><th>Município</th><th>Status</th></tr></thead><tbody id="logBody">${l.length?logRows(l):'<tr><td colspan="6" style="text-align:center;color:var(--muted)">Nenhuma consulta registrada ainda.</td></tr>'}</tbody></table></div>`;
+
+async function loadLic(){
+  const box=$('#licBody');box.innerHTML='<div class="skel"></div>';
+  const us=(await A().listUsers()).sort((a,b)=>(a.status==='pendente'?-1:0)-(b.status==='pendente'?-1:0));
+  const opt=s=>['pendente','ativo','bloqueado'].map(o=>`<option value="${o}"${o===s?' selected':''}>${o[0].toUpperCase()+o.slice(1)}</option>`).join('');
+  box.innerHTML=`<div class="card"><div class="bar-h">Licenciados <span class="pill">${us.length}</span></div><div class="tw"><table><thead><tr><th>Nome / e-mail</th><th>Código</th><th>Município</th><th>Status</th><th></th></tr></thead><tbody>${us.length?us.map(u=>`<tr data-uid="${esc(u.id)}"><td><b>${esc(u.nome||'')}</b><br><span class="muted sm">${esc(u.email)}</span></td><td><input class="f" data-f="codigo" value="${esc(u.codigo||'')}" placeholder="LIC-0001"></td><td><input class="f" data-f="municipio" value="${esc(u.municipio||'')}" placeholder="Cidade · UF"></td><td><select class="f" data-f="status">${opt(u.status)}</select></td><td><button class="btn primary sm2" data-save type="button">Salvar</button></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Nenhum licenciado cadastrado ainda.</td></tr>'}</tbody></table></div></div>`;
+  box.onclick=async e=>{
+    const b=e.target.closest('[data-save]');if(!b)return;
+    const tr=b.closest('tr'),data={};$$('[data-f]',tr).forEach(i=>data[i.dataset.f]=i.value.trim());
+    b.disabled=true;
+    try{await A().updateUser(tr.dataset.uid,data);toast('Licenciado atualizado.')}catch(err){toast(A().friendly(err))}
+    b.disabled=false;
+  };
+}
+async function loadReg(){
+  const box=$('#regBody');box.innerHTML='<div class="skel"></div>';
+  const l=await A().listConsultas(200);
+  box.innerHTML=`<div class="card"><div class="bar-h">Registros de consultas<input class="f" id="logQ" placeholder="Filtrar por licenciado, município ou tipo" style="margin-left:auto;min-width:240px"></div>${logTable(l)}</div>`;
+  $('#logQ').addEventListener('input',e=>{const t=e.target.value.toLowerCase();$('#logBody').innerHTML=logRows(l.filter(c=>[c.codigo,c.email,c.municipio,c.tipo,c.status].join(' ').toLowerCase().includes(t)))||'<tr><td colspan="6" style="text-align:center;color:var(--muted)">Nada encontrado.</td></tr>'});
+}
+async function loadApi(){
+  const box=$('#apiBody');box.innerHTML='<div class="skel"></div>';
+  const c=(await A().getApiConfig())||{};const ep=c.endpoints||{};
+  box.innerHTML=`<div class="card pad"><p class="muted sm">Os endereços usam <code class="mono">{valor}</code> no lugar do dado consultado (somente números para CPF, CNPJ, CEP e telefone).</p>
+  <form id="apiForm" style="margin-top:18px"><label class="chk"><input type="checkbox" id="apiOn"${c.ativo?' checked':''}>Integração ativa</label>
+  <div class="grid2" style="margin-top:16px">
+    <label>Nome do fornecedor<input class="f" id="apiProv" value="${esc(c.provedor||'')}" placeholder="Ex.: Fornecedor X"></label>
+    <label>URL base<input class="f" id="apiBase" value="${esc(c.baseUrl||'')}" placeholder="https://api.fornecedor.com/v1"></label>
+    <label>Cabeçalho de autenticação<input class="f" id="apiHdr" value="${esc(c.headerAuth||'Authorization')}"></label>
+    <label>Prefixo da chave<input class="f" id="apiPre" value="${esc(c.prefixoAuth??'Bearer ')}" placeholder="Bearer "></label>
+  </div>
+  <h3 style="margin:24px 0 12px;font-size:16px">Caminho de cada consulta</h3>
+  <div class="grid2">${Object.keys(TIPOS).map(k=>`<label>${TIPOS[k]}<input class="f mono" data-ep="${k}" value="${esc(ep[k]||'')}" placeholder="/${k}/{valor}"></label>`).join('')}</div>
+  <button class="btn primary" type="submit" style="margin-top:22px">Salvar configuração</button></form>
+  <div class="hint">A <b>chave secreta</b> do fornecedor não é salva aqui. Cadastre-a no servidor com <code>firebase functions:secrets:set PROVIDER_API_KEY</code>.${c.updatedBy?`<br>Última alteração: ${esc(c.updatedBy)} · ${fmtTs(c.updatedAt)}`:''}</div></div>`;
+  $('#apiForm').addEventListener('submit',async e=>{e.preventDefault();
+    const endpoints={};$$('[data-ep]').forEach(i=>{if(i.value.trim())endpoints[i.dataset.ep]=i.value.trim()});
+    try{await A().saveApiConfig({ativo:$('#apiOn').checked,provedor:$('#apiProv').value.trim(),baseUrl:$('#apiBase').value.trim(),headerAuth:$('#apiHdr').value.trim()||'Authorization',prefixoAuth:$('#apiPre').value,endpoints});toast('Configuração salva.')}catch(err){toast(A().friendly(err))}
+  });
+}
+
+/* ---------- permissões (somente administrador) ---------- */
+const PLAB={analise:'Análise',licenciados:'Licenciados',registros:'Registros',api:'API'};
+const permChecks=(p,pre)=>Object.keys(PLAB).map(k=>`<label class="chk"><input type="checkbox" data-pk="${k}"${p[k]?' checked':''}>${PLAB[k]}</label>`).join('');
+async function loadPerm(){
+  if(!isAdm)return;
+  const box=$('#permBody');box.innerHTML='<div class="skel"></div>';
+  const list=(await A().listPerms()).sort((a,b)=>a.email.localeCompare(b.email));
+  box.innerHTML=`<div class="stack">
+    <div class="card pad"><h3 style="font-size:17px;margin-bottom:12px">Dar acesso a um e-mail</h3>
+      <form id="permAdd"><div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><input class="f" id="permMail" type="email" required placeholder="email@exemplo.com" style="flex:1;min-width:240px">
+      <div>${permChecks({analise:true})}</div><button class="btn primary" type="submit">Conceder</button></div></form>
+      <div class="hint">O e-mail precisa entrar no site com a conta verificada (Google serve). Quem recebe permissão abre o painel e vê só as abas marcadas. O botão flutuante para voltar ao painel aparece apenas para o administrador.</div></div>
+    <div class="card"><div class="bar-h">E-mails com permissão <span class="pill">${list.length}</span></div><div class="tw"><table><thead><tr><th>E-mail</th><th>Abas liberadas</th><th></th></tr></thead><tbody>${list.length?list.map(u=>`<tr data-mail="${esc(u.email)}"><td><b>${esc(u.email)}</b></td><td>${permChecks(u)}</td><td style="text-align:right"><button class="btn primary sm2" data-save type="button">Salvar</button> <button class="btn sm2" data-del type="button">Remover</button></td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;color:var(--muted)">Nenhum e-mail com permissão ainda.</td></tr>'}</tbody></table></div></div></div>`;
+  const read=el=>{const p={};$$('[data-pk]',el).forEach(i=>p[i.dataset.pk]=i.checked);return p};
+  $('#permAdd').addEventListener('submit',async e=>{e.preventDefault();
+    try{await A().setPerm($('#permMail').value,read(e.target));toast('Permissão concedida.');loadPerm()}catch(err){toast(A().friendly(err))}});
+  box.onclick=async e=>{
+    const tr=e.target.closest('tr[data-mail]');if(!tr)return;
+    try{
+      if(e.target.closest('[data-save]')){await A().setPerm(tr.dataset.mail,read(tr));toast('Permissões atualizadas.')}
+      else if(e.target.closest('[data-del]')){if(!confirm('Remover o acesso de '+tr.dataset.mail+'?'))return;await A().deletePerm(tr.dataset.mail);toast('Acesso removido.');loadPerm()}
+    }catch(err){toast(A().friendly(err))}
+  };
+}
 
 /* ---------- análise ---------- */
 const regiaoDe=c=>{const m=(c.municipio||'').trim();return !m||m==='—'?'Sem município':m};
