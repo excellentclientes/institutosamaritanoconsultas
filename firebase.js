@@ -78,7 +78,14 @@ const friendly = (e) => ({
   "auth/popup-closed-by-user": "Login com Google cancelado.",
   "auth/popup-blocked": "O navegador bloqueou a janela do Google. Libere pop-ups para este site.",
   "auth/network-request-failed": "Sem conexão. Verifique a internet.",
-  "permission-denied": "Você não tem permissão para esta ação."
+  "permission-denied": "Você não tem permissão para esta ação.",
+  "functions/internal": "O servidor de consultas não respondeu. Verifique se as Cloud Functions foram publicadas (firebase deploy --only functions).",
+  "functions/not-found": "A função de consulta não foi encontrada. Publique as Cloud Functions na região southamerica-east1.",
+  "functions/unavailable": "A fonte de dados está indisponível no momento. Tente novamente.",
+  "functions/failed-precondition": "A integração de API ainda não foi configurada no painel admin (aba API).",
+  "functions/permission-denied": "Seu acesso ainda não foi liberado pelo administrador.",
+  "functions/unauthenticated": "Faça login para consultar.",
+  "functions/invalid-argument": "Valor inválido para esta consulta."
 }[e.code] || e.message || "Erro inesperado.");
 
 const today0 = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return Timestamp.fromDate(d); };
