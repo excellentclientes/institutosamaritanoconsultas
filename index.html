@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Atlas Consultas</title>
+<title>Instituto Samaritano</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -284,9 +284,9 @@ td .f{width:100%;min-width:120px}
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#topo" aria-label="Atlas Consultas">
+    <a class="brand" href="#topo" aria-label="Instituto Samaritano">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--accent)"/><circle cx="14.5" cy="14.5" r="6" fill="none" stroke="var(--accent-ink)" stroke-width="2.6"/><path d="m19.5 19.5 5.5 5.5" stroke="var(--accent-ink)" stroke-width="2.8" stroke-linecap="round"/></svg>
-      Atlas
+      Instituto Samaritano
     </a>
     <nav class="main" aria-label="Principal">
       <a href="#catalogo">Consultas</a><a href="#fluxo">Como funciona</a><a href="#" id="navAdmin" hidden>Painel admin</a><a href="painel.html" id="navPainel" hidden>Análise</a><a href="#seguranca">Segurança</a>
@@ -385,7 +385,7 @@ td .f{width:100%;min-width:120px}
 <div id="adminView" hidden>
   <div class="wrap" style="padding-block:32px 72px">
     <div class="adm-h">
-      <div><div class="kicker">Painel do administrador</div><h2>Gestão do Atlas</h2></div>
+      <div><div class="kicker">Painel do administrador</div><h2>Gestão do Instituto Samaritano</h2></div>
       <button class="btn" id="admBack" type="button">Voltar ao site</button>
     </div>
     <div class="tabs" id="admTabs" role="tablist">
@@ -399,7 +399,7 @@ td .f{width:100%;min-width:120px}
 </div>
 
 
-<footer><div class="wrap"><span>© 2026 Atlas Consultas. Todos os direitos reservados.</span><span>Acesso restrito a usuários autorizados</span></div></footer>
+<footer><div class="wrap"><span>© 2026 Instituto Samaritano. Todos os direitos reservados.</span><span>Acesso restrito a usuários autorizados</span></div></footer>
 
 <div class="modal" id="modal" hidden>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="mTitle">
@@ -614,7 +614,8 @@ window.addEventListener('atlas:auth',e=>{
   const nm=d.profile?(d.isAdmin?'Administrador':(d.profile.codigo||d.profile.nome||d.user.email)):(d.user?d.user.email:'');
   $('#whoT').textContent=nm;$('#whoI').textContent=(nm||'?').trim().slice(0,2).toUpperCase();
   $('#navAdmin').hidden=!d.isAdmin;$('#navPainel').hidden=!d.isAdmin;
-  if(on&&!modal.hidden){closeM()}
+  const fresh=on&&!modal.hidden;if(fresh){closeM()}
+  if(fresh&&d.isAdmin){location.href='painel.html';return}
   if(on){
     if(d.error)toast('Não foi possível carregar seu cadastro: '+d.error);
     else if(d.isAdmin)toast('Bem-vindo, administrador.');
